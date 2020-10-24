@@ -1,7 +1,10 @@
 #ifndef Registration_H
 #define Registration_H
-#include "qaesencryption.h"
+
+#include <QMessageAuthenticationCode>
+
 #include <QDialog>
+#include <QCryptographicHash>
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QObject>
@@ -9,7 +12,7 @@
 #include <QSqlQuery>
 #include <QDebug>
 #include <QMainWindow>
-
+#include <QRandomGenerator>
 
 namespace Ui {
     class Registration;

@@ -1,7 +1,7 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
-
+#include <QMessageAuthenticationCode>
 #include <QMessageBox>
 #include <QSqlDatabase>
 #include <QObject>
@@ -11,7 +11,7 @@
 #include <QMainWindow>
 #include <QCryptographicHash>
 #include "registration.h"
-#include "qaesencryption.h"
+
 
 namespace Ui {
 class Login;

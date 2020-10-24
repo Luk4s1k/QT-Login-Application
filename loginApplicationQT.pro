@@ -9,12 +9,10 @@ QT += sql
 
 SOURCES += main.cpp\
            login.cpp \
-           qaesencryption.cpp \
            registration.cpp
 
 HEADERS  += \
             login.h \
-            qaesencryption.h \
             registration.h
 
 

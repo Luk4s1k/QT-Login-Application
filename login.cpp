@@ -8,13 +8,14 @@ Login::Login(QWidget *parent) :
     ui(new Ui::Login)
 {
     ui->setupUi(this);
-
+// make ssh connection HERE!
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL","mainbase");
     qDebug() << db.lastError();
-    db.setHostName("localhost");
+    db.setHostName("156.17.224.165"); //set host ip where db locates
+    db.setPort(8889); // port which will be listened by server
     db.setDatabaseName("loginapp_db");
-    db.setUserName("root");
-    db.setPassword("luka1234@");
+    db.setUserName("luka");
+    db.setPassword("1234");
 
     if (!db.open()) {
         QMessageBox::critical(0,"Connection error","Could not connect to the database");
@@ -38,12 +39,20 @@ void Login::on_signInButton_clicked()
 
      QString password = ui->passwordField->text();
      QString userName = ui->usernameField->text();
-     QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
+
+
+    //QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
      //encoded pass must be with static salt and dynamic salt stored in db
      // add dynamic salt in db
      //add dynamic  salt generator
-     QString encodedPass = encryption.getEncodedText(password);
+     //QString encodedPass = encryption.getEncodedText(password);
+     QByteArray message =  QByteArray::fromHex(password.toUtf8());
+     QByteArray key = "key";
+     QMessageAuthenticationCode encodePass(QCryptographicHash::Sha256);
+           encodePass.setKey(key);
+           encodePass.addData(message);
 
+     QString encryptedPass(encodePass.result().toHex());
 
 
 
@@ -72,7 +81,7 @@ void Login::on_signInButton_clicked()
     }
     query.first();
     QVariant v = query.value(0);
-    if(encodedPass == v.toString()){ //changed to encoded Pass
+    if(encryptedPass == v.toString()){ //changed to encoded Pass
         QMessageBox::information(0,"Login Sucessfull","Login Sucessfull");
         // next app window open here
 

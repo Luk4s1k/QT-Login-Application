@@ -13,6 +13,20 @@ Registration::~Registration()
     delete ui;
 }
 
+QString getRandomString(){
+   const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+   const int randomStringLength = 12;
+   QString randomString;
+   for(int i = 0; i < randomStringLength; ++i)
+   {
+
+     int index = QRandomGenerator::global()->generate() % possibleCharacters.length();
+     QChar nextChar = possibleCharacters.at(index);
+     randomString.append(nextChar);
+   }
+   return randomString;
+}
+
 void Registration::on_signUpButton_clicked()
 {
     QSqlDatabase db = QSqlDatabase::database("mainbase");
@@ -20,9 +34,6 @@ void Registration::on_signUpButton_clicked()
     QString username = ui->usernameField->text();
     QString password = ui->passwordField->text();
     QString email = ui->emailField->text();
- // add dynamic salt addition here
-     QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
-     QString encodedPass = encryption.getEncodedText(password);
 
     QVariant v,a;
     QSqlQuery query(db);
@@ -74,14 +85,14 @@ void Registration::on_signUpButton_clicked()
         return;
     }
 
-
-
-
-        //-----------------------------------------
+        /*---------------Password encryption ------------------------------*/
+        QString dynamicSalt = getRandomString();
+        QString message = password + dynamicSalt;
+        QByteArray encryptedPass = QCryptographicHash::hash(message.toUtf8(), QCryptographicHash::Sha256);
+        /*----------------------Values Insertion---------------------------*/
         query.prepare(" INSERT INTO `users` VALUES (?, ?, ?)");
-        // add dynamic salt storing here
         query.bindValue(0, username);
-        query.bindValue(1, encodedPass);
+        query.bindValue(1, encryptedPass.toHex());
         query.bindValue(2, email);
 
         if (!query.exec()) {
