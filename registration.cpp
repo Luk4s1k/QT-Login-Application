@@ -55,7 +55,7 @@ void Registration::on_signUpButton_clicked()
 
 /*-------------------    Check For Username in Database   ---------------------------------------------------*/
 
-    query.prepare(QString("SELECT `Username` FROM `users` WHERE `Username` =  :user_name"));
+    query.prepare(QString("SELECT `Username` FROM `users1` WHERE `Username` =  :user_name"));
     query.bindValue(":user_name" , username);
 
     if (!query.exec()) {
@@ -71,7 +71,7 @@ void Registration::on_signUpButton_clicked()
     }
     /*------------------------    Check For Email in Database   ---------------------------------------------*/
 
-    query.prepare(QString("SELECT `Email` FROM `users`  WHERE `Email` = :email"));
+    query.prepare(QString("SELECT `Email` FROM `users1`  WHERE `Email` = :email"));
     query.bindValue(":email", email);
     if (!query.exec()) {
         qDebug() << query.lastError().text();
@@ -86,14 +86,16 @@ void Registration::on_signUpButton_clicked()
     }
 
         /*---------------Password encryption ------------------------------*/
-        QString dynamicSalt = getRandomString();
-        QString message = password + dynamicSalt;
+        QString staticSalt = "AxYh9huk#Md$"; //insert your own static salt
+        QString dynamicSalt = getRandomString(); // generates random salt unique for every new user
+        QString message = staticSalt + password + dynamicSalt;
         QByteArray encryptedPass = QCryptographicHash::hash(message.toUtf8(), QCryptographicHash::Sha256);
         /*----------------------Values Insertion---------------------------*/
-        query.prepare(" INSERT INTO `users` VALUES (?, ?, ?)");
+        query.prepare(" INSERT INTO `users1` VALUES (?, ?, ?,?)");
         query.bindValue(0, username);
         query.bindValue(1, encryptedPass.toHex());
-        query.bindValue(2, email);
+        query.bindValue(2, dynamicSalt);
+         query.bindValue(3, email);
 
         if (!query.exec()) {
             qDebug() << query.lastError().text();

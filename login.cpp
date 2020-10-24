@@ -68,7 +68,7 @@ void Login::on_signInButton_clicked()
 
 
     QSqlQuery query(db);
-    query.prepare("SELECT `Passwords` FROM `users` WHERE `Username` = :user_name");
+    query.prepare("SELECT `Passwords` FROM `users1` WHERE `Username` = :user_name");
     query.bindValue(":user_name", userName);
     bool logcheck = true;
     if (!query.exec()) {
