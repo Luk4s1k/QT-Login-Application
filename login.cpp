@@ -8,11 +8,10 @@ Login::Login(QWidget *parent) :
     ui(new Ui::Login)
 {
     ui->setupUi(this);
-// make ssh connection HERE!
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL","mainbase");
     qDebug() << db.lastError();
-    db.setHostName("156.17.224.165"); //set host ip where db locates
-    db.setPort(8889); // port which will be listened by server
+    db.setHostName("156.17.224.165");
+    db.setPort(8889);
     db.setDatabaseName("loginapp_db");
     db.setUserName("luka");
     db.setPassword("1234");
@@ -20,7 +19,8 @@ Login::Login(QWidget *parent) :
     if (!db.open()) {
         QMessageBox::critical(0,"Connection error","Could not connect to the database");
      }
-    else { QMessageBox::information(0,"Connection","Connected");}
+    else {
+        QMessageBox::information(0,"Connection","Connected");}
 }
 
 Login::~Login(){
@@ -41,21 +41,6 @@ void Login::on_signInButton_clicked()
      QString userName = ui->usernameField->text();
 
 
-    //QAESEncryption encryption(QAESEncryption::AES_256, QAESEncryption::CBC);
-     //encoded pass must be with static salt and dynamic salt stored in db
-     // add dynamic salt in db
-     //add dynamic  salt generator
-     //QString encodedPass = encryption.getEncodedText(password);
-     QByteArray message =  QByteArray::fromHex(password.toUtf8());
-     QByteArray key = "key";
-     QMessageAuthenticationCode encodePass(QCryptographicHash::Sha256);
-           encodePass.setKey(key);
-           encodePass.addData(message);
-
-     QString encryptedPass(encodePass.result().toHex());
-
-
-
    if(userName==""){
         QMessageBox::critical(0, "No username provided","Username Field is empty");
         return;     }
@@ -68,7 +53,7 @@ void Login::on_signInButton_clicked()
 
 
     QSqlQuery query(db);
-    query.prepare("SELECT `Passwords` FROM `users1` WHERE `Username` = :user_name");
+    query.prepare("SELECT `Password` ,`Salt` FROM `users1` WHERE `Username` = :user_name");
     query.bindValue(":user_name", userName);
     bool logcheck = true;
     if (!query.exec()) {
@@ -80,8 +65,11 @@ void Login::on_signInButton_clicked()
         return;
     }
     query.first();
-    QVariant v = query.value(0);
-    if(encryptedPass == v.toString()){ //changed to encoded Pass
+    QVariant databasePass = query.value(0);
+    QString staticSalt = "AxYh9huk#Md$";
+    QString saltedPass = staticSalt + password + query.value(1).toString();
+    QByteArray encryptedInputPass = QCryptographicHash::hash(saltedPass.toUtf8(), QCryptographicHash::Sha256);
+    if(encryptedInputPass.toHex() == databasePass){
         QMessageBox::information(0,"Login Sucessfull","Login Sucessfull");
         // next app window open here
 
@@ -93,16 +81,12 @@ void Login::on_signInButton_clicked()
 
 }
 
-
-
-
-
 void Login::on_checkBox_toggled(bool checked)
 {
-//    int currentState = ui->checkBox->checkState();
+
     if (checked == false){
         ui->passwordField->setEchoMode(QLineEdit::Password);
-    }else{
+    } else{
         ui->passwordField->setEchoMode(QLineEdit::Normal);
     }
 

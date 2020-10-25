@@ -86,16 +86,18 @@ void Registration::on_signUpButton_clicked()
     }
 
         /*---------------Password encryption ------------------------------*/
+
         QString staticSalt = "AxYh9huk#Md$"; //insert your own static salt
         QString dynamicSalt = getRandomString(); // generates random salt unique for every new user
         QString message = staticSalt + password + dynamicSalt;
         QByteArray encryptedPass = QCryptographicHash::hash(message.toUtf8(), QCryptographicHash::Sha256);
+
         /*----------------------Values Insertion---------------------------*/
         query.prepare(" INSERT INTO `users1` VALUES (?, ?, ?,?)");
         query.bindValue(0, username);
         query.bindValue(1, encryptedPass.toHex());
         query.bindValue(2, dynamicSalt);
-         query.bindValue(3, email);
+        query.bindValue(3, email);
 
         if (!query.exec()) {
             qDebug() << query.lastError().text();
