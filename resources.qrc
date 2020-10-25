@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>icons8-closed-eye-24.png</file>
+        <file>icons8-eye-24.png</file>
+        <file>../../Desktop/Снимок экрана 2020-10-25 в 14.38.00.png</file>
+    </qresource>
+</RCC>

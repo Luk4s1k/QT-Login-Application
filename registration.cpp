@@ -33,6 +33,7 @@ void Registration::on_signUpButton_clicked()
 
     QString username = ui->usernameField->text();
     QString password = ui->passwordField->text();
+    QString passwordRepeat = ui->passRepeatField->text();
     QString email = ui->emailField->text();
 
     QVariant v,a;
@@ -40,17 +41,24 @@ void Registration::on_signUpButton_clicked()
 
     /*-----------------    Check for empty Fields     --------------*/
 
-    if(username==""){
+    if(passwordRepeat == ""){
+        QMessageBox::critical(0,"No repeat Password", "Repeat the Password");
+        return;
+    }
+    if(username == ""){
         QMessageBox::critical(0,"No Username", "Please Enter the username");
         return;
     }
-    if(password==""){
+    if(password == ""){
         QMessageBox::critical(0,"No Password", "Please Enter the password");
         return;
     }
-    if(email==""){
+    if(email == ""){
         QMessageBox::critical(0,"No email", "Please Enter the email");
       return;
+    }
+    if(password != passwordRepeat){
+        QMessageBox::critical(0,"Password don't match", "Passwords need to match");
     }
 
 /*-------------------    Check For Username in Database   ---------------------------------------------------*/

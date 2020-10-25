@@ -20,3 +20,8 @@ FORMS    += \
     login.ui \
     registration.ui
 
+DISTFILES +=
+
+RESOURCES += \
+    resources.qrc
+
